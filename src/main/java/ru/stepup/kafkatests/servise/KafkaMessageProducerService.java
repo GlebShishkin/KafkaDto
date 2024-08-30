@@ -23,15 +23,13 @@ public class KafkaMessageProducerService {
         this.kafkaConfTemplate = kafkaConfTemplate;
     }
 
+    // регистрация участника в "topic1"
     public void send(RegistrationDto msg) {
-        log.info("1) ############## KafkaMessageProducerService");
         kafkaRegTemplate.send(TOPIC1, msg);
-        log.info("2) ############## KafkaMessageProducerService");
     }
 
+    // регистрация конференции в "topic2"
     public void addConf(ConferenceDto msg) {
-        log.info("1) ############## KafkaMessageProducerService: sendConf");
         kafkaConfTemplate.send(TOPIC2, msg);
-        log.info("2) ############## KafkaMessageProducerService: sendConf");
     }
 }

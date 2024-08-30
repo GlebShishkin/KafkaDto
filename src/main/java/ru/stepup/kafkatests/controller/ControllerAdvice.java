@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.stepup.kafkatests.exceptions.AppError;
 import ru.stepup.kafkatests.exceptions.NotFoundException;
 
 @Slf4j
@@ -17,4 +18,13 @@ public class ControllerAdvice {
                 .status(HttpStatus.NOT_FOUND)
                 .body(exception.getMessage());
     }
+
+    @ExceptionHandler(AppError.class)
+    public ResponseEntity<String> handleException(AppError exception) {
+        log.info("#####################/api ControllerAdvice: exception.getErrorMessage(): = " + exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(exception.getMessage());
+    }
 }
+

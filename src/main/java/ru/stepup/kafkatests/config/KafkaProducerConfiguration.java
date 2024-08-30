@@ -1,4 +1,4 @@
-package ru.stepup.kafkatests;
+package ru.stepup.kafkatests.config;
 
 import java.util.HashMap;
 import java.util.Map;

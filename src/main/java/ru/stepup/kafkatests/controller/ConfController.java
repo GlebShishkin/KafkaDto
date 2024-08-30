@@ -3,12 +3,13 @@ package ru.stepup.kafkatests.controller;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.stepup.kafkatests.dto.ConferenceDto;
 import ru.stepup.kafkatests.dto.RegistrationDto;
+import ru.stepup.kafkatests.entity.ConfRegistration;
+import ru.stepup.kafkatests.exceptions.NotFoundException;
 import ru.stepup.kafkatests.servise.KafkaMessageConsumerService;
 import ru.stepup.kafkatests.servise.KafkaMessageProducerService;
 
@@ -30,21 +31,15 @@ public class ConfController {
 
     // регистрация пользователя в конференции в "topic1"
     @PutMapping(value = "/register")
-    public ResponseEntity<?> registrtion(@Valid @RequestBody RegistrationDto registrationDto,
-                                      BindingResult bindingResult) throws BindException {
+    public ResponseEntity<?> registrtion(@Valid @RequestBody RegistrationDto registrationDto) {
 
 log.info("############## name = " + registrationDto.name() + "; getConferenceId  = " + registrationDto.conferenceId());
-        if (bindingResult.hasErrors()) {
-            if (bindingResult instanceof BindException exception) {
-                throw exception;
-            } else {
-                throw new BindException(bindingResult);
-            }
-        } else {
+        try {
             kafkaMessageProducerService.send(registrationDto);
-            return ResponseEntity.noContent()
-                    .build();
+        } catch (Exception e) {
+            throw new NotFoundException("Conference not found", HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(new ConfRegistration(registrationDto.name(), registrationDto.conferenceId()), HttpStatus.OK);
     }
 
     // получение пользоватей в конференции id = conferenceID из "topic1"
@@ -57,21 +52,14 @@ log.info("############## name = " + registrationDto.name() + "; getConferenceId 
 
     // заведение конференции в "topic2"
     @PutMapping(value = "/addConference")
-    public ResponseEntity<?> addConference(@Valid @RequestBody ConferenceDto conferenceDto,
-                                         BindingResult bindingResult) throws BindException {
-
-        log.info("############## getConferenceId  = " + conferenceDto.conferenceId() + "; name = " + conferenceDto.name());
-        if (bindingResult.hasErrors()) {
-            if (bindingResult instanceof BindException exception) {
-                throw exception;
-            } else {
-                throw new BindException(bindingResult);
-            }
-        } else {
+    public ResponseEntity<?> addConference(@Valid @RequestBody ConferenceDto conferenceDto) {
+        try {
             kafkaMessageProducerService.addConf(conferenceDto);
-            return ResponseEntity.noContent()
-                    .build();
         }
+        catch (Exception e) {
+            ResponseEntity.badRequest().body("Conferece exist");
+        }
+        return ResponseEntity.ok().body("");
     }
 }
 

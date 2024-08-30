@@ -29,12 +29,12 @@ import java.util.Properties;
 @Service
 public class KafkaMessageConsumerService {
 
-	// вычитываем из "topic2" данные о заведении конференции через ConfController.addConference
+	// получение из "topic2" данны[х о заведении конференции через ConfController.addConference
 	@SuppressWarnings({ "static-method", "unused" })
 	@KafkaListener(topics = "topic2")
 	public void onMessage(@Payload ConferenceDto msg,
 						  @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-						  @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,	//???
+						  @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
 						  @Header(KafkaHeaders.OFFSET) Long offset) {
 		log.info("!!!!!!!!!!!!!!! Message consumed {}", msg);
 	}
